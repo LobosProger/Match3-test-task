@@ -15,7 +15,8 @@ public class ScoreShower : MonoBehaviour
 		dateText.text = date;
 		scoreText.text = score.ToString();
 	}
-
+	
+	//* Подсвечиваем блок с информацией, если мы достигли нового рекорда
 	public void LightTheBlock()
 	{
 		GetComponent<Image>().color = Color.yellow;

@@ -18,10 +18,12 @@ public class ScoreLoader : MonoBehaviour
 
 	public static void LoadScoreInGame()
 	{
+		//* Если игра впервые была запущена, то загружаем рекорды из таблицы csv
 		if (!PlayerPrefs.HasKey(_nameOfFieldAmountScoreToWriteInMemory))
 		{
 			TextAsset table = Resources.Load<TextAsset>(pathOfTableOfScore);
 			string[] data = table.text.Split(new string[] { ";", "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+			//* Получаем список рекордов, предаварительно записав их в память
 			for (int row = 2; row < data.Length; row += 2)
 			{
 				ScoreData score = new ScoreData
@@ -34,6 +36,7 @@ public class ScoreLoader : MonoBehaviour
 		}
 		else
 		{
+			//* Иначе - получаем рекорды и записываем их в список
 			for (int scoreIndex = 0; scoreIndex < PlayerPrefs.GetInt(_nameOfFieldAmountScoreToWriteInMemory); scoreIndex++)
 			{
 				ScoreData score = ReadScore(scoreIndex);
@@ -43,7 +46,9 @@ public class ScoreLoader : MonoBehaviour
 
 		isScoreLoadedIntoGame = true;
 	}
-
+	
+	//* Считываем рекорд по индексу, просто добавляя индекс в конец строки
+	//* => При этом, мы также записываем число рекордов в память для последующего доступа по индексу
 	private static ScoreData ReadScore(int scoreIndex)
 	{
 		return new ScoreData

@@ -13,7 +13,8 @@ public class ScoreController : MonoBehaviour
 	private void Start()
 	{
 		LoadScore();
-
+		
+		//* При попадании в меню рекордов сортируем список рекордов в порядке убывания
 		List<ScoreLoader.ScoreData> sortedListWithRecords = new List<ScoreLoader.ScoreData>(ScoreLoader.tableWithScore);
 		sortedListWithRecords = sortedListWithRecords.OrderByDescending(x => x.score).ToList();
 

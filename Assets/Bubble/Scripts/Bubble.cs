@@ -10,7 +10,8 @@ public class Bubble : MonoBehaviour
 	private Image bubbleImage;
 	private Animator animator;
 	private Vector2Int keyOfBubbleOnGrid;
-
+	
+	//* Для оптимизации храним хэш самого триггера, а не его имя
 	private readonly int animatorState_Idle = Animator.StringToHash("Idle");
 	private readonly int animatorState_Destroy = Animator.StringToHash("Destroy");
 	private void Awake()
@@ -19,6 +20,7 @@ public class Bubble : MonoBehaviour
 		bubbleParticleEffect = GetComponent<ParticleSystem>();
 		bubbleImage = GetComponent<Image>();
 		animator = GetComponent<Animator>();
+		//! Во время отключения игрового объекта система mecanim может поломаться и после повторного включения анимации или состояния будут некорректно отображаться
 		animator.keepAnimatorControllerStateOnDisable = true;
 	}
 
@@ -31,6 +33,7 @@ public class Bubble : MonoBehaviour
 
 	public void TouchBubble()
 	{
+		//* Шарик может взаимодействовать с игровой доской при условии, если шарики по ней не начали вставать на пустые лунки, либо число ходов не равно нулю
 		if (!BoardController.singletonBoardController.IsBoardRefreshing() && BoardController.singletonBoardController.IsBoardClickable())
 		{
 			bubbleSound.Play();
@@ -52,6 +55,7 @@ public class Bubble : MonoBehaviour
 		keyOfBubbleOnGrid = newKey;
 		transform.position = newPosition.transform.position;
 	}
-
+	
+	//* Тип шарика сравнивается по цвету
 	public bool IsBubbleSimilar(Bubble comparingBubble) => comparingBubble.bubbleImage.color == this.bubbleImage.color;
 }

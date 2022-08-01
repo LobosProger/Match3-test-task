@@ -38,6 +38,7 @@ public class GameController : MonoBehaviour
 		}
 		else
 		{
+			//* Если число лопнутых шаров более одного, то добавляем число ходов и воспроизводим анимацию на тексте
 			amountOfRemainedSteps += amountOfDestroyingBubbles - 1;
 			animatorOfText.SetTrigger(animatorState_Zoom);
 		}

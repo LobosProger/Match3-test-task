@@ -9,10 +9,12 @@ public class BoardController : MonoBehaviour
 	private Bubble bubblePrefab;
 	[SerializeField]
 	private int gridSize = 6;
-
+	
+	//* В каждой ячейке будет появляться шарик
 	private Dictionary<Vector2Int, Bubble> bubblesOnGrid = new Dictionary<Vector2Int, Bubble>();
+	//* Храним ячейки в словаре, где каждой ячейке присвоена позиция, из которой будет появляться шарик
 	private Dictionary<Vector2Int, Transform> spawnPointOnGridForBubbles = new Dictionary<Vector2Int, Transform>();
-
+	//* Каждый уничтоженный шарик храним в куче, из которой удобно "брать" шарики
 	private Stack<Bubble> destroyedBubles = new Stack<Bubble>();
 
 	public static BoardController singletonBoardController;
@@ -27,12 +29,14 @@ public class BoardController : MonoBehaviour
 
 	private void SetupBoard()
 	{
+		//* Создаем массив, в котором будет храниться позиция ячейки
 		Transform[] transforms = new Transform[transform.childCount];
 		for (int i = 0; i < transform.childCount; i++)
 		{
 			transforms[i] = transform.GetChild(i);
 		}
-
+		
+		//* Теперь добавляем в словарь ячейки по x и y координате
 		int indexOfChildTransformSpawnPoints = 0;
 		for (int y = 0; y < gridSize; y++)
 		{
@@ -42,7 +46,8 @@ public class BoardController : MonoBehaviour
 				indexOfChildTransformSpawnPoints++;
 			}
 		}
-
+		
+		//* Создаем шарики, добавляя их к ячейкам на доске
 		foreach (Vector2Int everyCell in spawnPointOnGridForBubbles.Keys)
 		{
 			Bubble createdBubble = Instantiate(bubblePrefab);
@@ -78,11 +83,13 @@ public class BoardController : MonoBehaviour
 	}
 
 	public void RemoveBubbleFromBoard(Vector2Int key)
-	{
+	{	
+		//* При нажатии на какой-либо шарик проверяем по горизонтали и по вертикали совпадения
 		if (!IsAnyBubblesOnHorizontalLine(key))
 		{
 			if (!IsAnyBubblesOnVerticalLine(key))
 			{
+				//* Если их нету - просто уничтожаем один шарик и списываем ход
 				GameController.singletonGameController.DestroyBubbles(1);
 				RemoveBubble(key);
 			}
@@ -145,7 +152,6 @@ public class BoardController : MonoBehaviour
 		Vector2Int checkingBubbleOnDownSideVerticalLine = new Vector2Int(keyOfTouchedBubble.x, keyOfTouchedBubble.y - 1);
 		while (true)
 		{
-			//* Здесь идем вдоль правой стороны - то есть проверяем шарики справа относительного нажатого шарика
 			if (bubblesOnGrid.ContainsKey(checkingBubbleOnUpSideVerticalLine))
 			{
 				if (bubblesOnGrid[keyOfTouchedBubble].IsBubbleSimilar(bubblesOnGrid[checkingBubbleOnUpSideVerticalLine]))
@@ -198,18 +204,21 @@ public class BoardController : MonoBehaviour
 
 	private void MoveBubblesAndFillBoard()
 	{
+		//* Здесь в коде мы проверяем полностью доску на наличие пустых ячеек, если они есть, то "спускаем" шарики вниз, при этом не затрагиваем самый верхний ряд (строку)
 		for (int y = gridSize - 1; y >= 1; y--)
 		{
 			for (int x = gridSize - 1; x >= 0; x--)
 			{
 				if (bubblesOnGrid[new Vector2Int(x, y)] is null)
 				{
+					//* Если мы обнаружили пустую лунку, то идем вверх вдоль нее
 					for (int detectedBubbleOnY = y - 1; detectedBubbleOnY >= 0; detectedBubbleOnY--)
 					{
 						Vector2Int keyOfDetectedBubble = new Vector2Int(x, detectedBubbleOnY);
 						Vector2Int keyOfNullCellInGridOfBubbles = new Vector2Int(x, y);
 						if (bubblesOnGrid[keyOfDetectedBubble] != null)
 						{
+							//* Если мы обнаружили шарик, то спускаем его вниз, на место лунки
 							bubblesOnGrid[keyOfDetectedBubble].UpdateBubblePositionOnGrid(keyOfNullCellInGridOfBubbles, spawnPointOnGridForBubbles[keyOfNullCellInGridOfBubbles]);
 							bubblesOnGrid[keyOfNullCellInGridOfBubbles] = bubblesOnGrid[keyOfDetectedBubble];
 							bubblesOnGrid[keyOfDetectedBubble] = null;
@@ -219,7 +228,8 @@ public class BoardController : MonoBehaviour
 				}
 			}
 		}
-
+		
+		//* Здесь, в данном коде, проверяем вновь доску и заполняем пустые лунки шариками 
 		for (int y = gridSize - 1; y >= 0; y--)
 		{
 			for (int x = gridSize - 1; x >= 0; x--)
@@ -231,7 +241,8 @@ public class BoardController : MonoBehaviour
 				}
 			}
 		}
-
+		
+		//* Во время движения шариков на доске у пользователя отсутствует возможность нажимать на них во избежание багов
 		isBoardRefreshing = false;
 	}
 
